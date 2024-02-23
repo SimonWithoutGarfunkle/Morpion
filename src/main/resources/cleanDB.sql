@@ -1,0 +1,2 @@
+DELETE FROM joueur;
+DELETE FROM partie;
