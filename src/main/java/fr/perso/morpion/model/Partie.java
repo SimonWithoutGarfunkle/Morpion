@@ -26,4 +26,8 @@ public class Partie {
     @JoinColumn(name = "joueur2_id")
     private Joueur joueur2;
 
+    private int x = 3;
+
+    private int y = 3;
+
 }
