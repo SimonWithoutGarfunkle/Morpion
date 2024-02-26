@@ -24,4 +24,8 @@ public class Joueur {
 
     private char marqueur;
 
+    public Joueur(String joueur1, char x) {
+        this.pseudo = joueur1;
+        this.marqueur = x;
+    }
 }

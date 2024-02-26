@@ -1,7 +1,8 @@
-package fr.perso.morpion.service;
+package fr.perso.morpion.service.implementation;
 
 import fr.perso.morpion.model.Joueur;
 import fr.perso.morpion.repository.JoueurRepository;
+import fr.perso.morpion.service.IJoueurService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +15,7 @@ public class JoueurServiceImpl implements IJoueurService {
     private JoueurRepository joueurRepository;
 
     @Override
-    public void ajouterJoueur(Joueur joueur) {
-        joueurRepository.save(joueur);
-    }
+    public Joueur ajouterJoueur(Joueur joueur) { return joueurRepository.save(joueur); }
 
     @Override
     public Joueur getJoueurById(Integer id) {
@@ -29,14 +28,12 @@ public class JoueurServiceImpl implements IJoueurService {
     }
 
     @Override
-    public void modifierJoueur(Joueur joueur) {
-        joueurRepository.save(joueur);
-
-    }
+    public Joueur modifierJoueur(Joueur joueur) { return joueurRepository.save(joueur); }
 
     @Override
     public void supprimerJoueur(Integer id) {
         joueurRepository.deleteById(id);
     }
+
 
 }

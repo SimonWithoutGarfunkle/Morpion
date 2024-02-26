@@ -14,6 +14,7 @@ import lombok.Setter;
 public class Tour {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idTour;
 
     @ManyToOne
@@ -26,4 +27,10 @@ public class Tour {
 
     private int emplacement;
 
+    public Tour(Partie partie, int i, char marqueur, int emplacement) {
+        this.partie = partie;
+        this.numeroTour = i;
+        this.marqueur = marqueur;
+        this.emplacement = emplacement;
+    }
 }
