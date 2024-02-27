@@ -26,17 +26,19 @@ public class PartieServiceImpl implements IPartieService {
     private static final Logger logger = Logger.getLogger(LoggerFactory.class.getName());
 
     @Override
-    public void ajouterTourAPartie(Integer idPartie, Tour tour) {
+    public void ajouterTourAPartie(Integer idPartie, int emplacement) {
         Partie partie = getPartieById(idPartie);
         if (partie != null) {
-            partie.getTours().add(tour);
-            partieRepository.save(partie);
+            Tour tour = tourService.ajouterTour(new Tour(partie, partie.getTours().size() + 1, prochainJoueurAJouer(partie).getMarqueur(), emplacement));
+            logger.info("Tour cree id n°" + tour.getIdTour());
+            if (validerTour(partie, tour)) {
+                logger.info("Tour valide");
+                partie.getTours().add(tour);
+                partieRepository.save(partie);
+            } else {
+                logger.info("Tour invalide");
+            }
         }
-    }
-
-    @Override
-    public Tour genererTour(Partie partie, int emplacement) {
-        return tourService.ajouterTour(new Tour(partie, partie.getTours().size() + 1, prochainJoueurAJouer(partie).getMarqueur(), emplacement));
     }
 
     @Override

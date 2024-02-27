@@ -1,5 +1,6 @@
 package fr.perso.morpion.controller;
 
+import fr.perso.morpion.model.Partie;
 import fr.perso.morpion.model.Tour;
 import fr.perso.morpion.service.implementation.PartieServiceImpl;
 import org.slf4j.LoggerFactory;
@@ -24,8 +25,7 @@ public class PartieController {
 
     @PostMapping("/{id}/tour")
     public void jouerTour(@RequestParam int emplacement, @PathVariable(value = "id") Integer id) {
-        Tour tour = partieService.genererTour(partieService.getPartieById(id), emplacement);
-        partieService.ajouterTourAPartie(id, tour);
+        partieService.ajouterTourAPartie(id, emplacement);
     }
 
     @GetMapping("/new")

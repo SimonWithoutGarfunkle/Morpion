@@ -6,9 +6,7 @@ import fr.perso.morpion.model.Tour;
 
 public interface IPartieService {
 
-    void ajouterTourAPartie(Integer idPartie, Tour tour);
-
-    Tour genererTour(Partie partie, int emplacement);
+    void ajouterTourAPartie(Integer idPartie, int emplacement);
 
     Joueur prochainJoueurAJouer(Partie partie);
 
