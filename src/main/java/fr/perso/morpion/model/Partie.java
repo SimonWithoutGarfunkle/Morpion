@@ -29,14 +29,18 @@ public class Partie {
     @JoinColumn(name = "joueur2_id")
     private Joueur joueur2;
 
-    private int x = 3;
+    private int longueur;
 
-    private int y = 3;
+    private int hauteur;
 
-    public Partie (Joueur joueur1, Joueur joueur2) {
+    private StatusPartie statusPartie = StatusPartie.EN_COURS;
+
+    public Partie (Joueur joueur1, Joueur joueur2, int longueur, int hauteur) {
         this.joueur1 = joueur1;
         this.joueur2 = joueur2;
         tours = new ArrayList<>();
+        this.longueur = longueur;
+        this.hauteur = hauteur;
     }
 
 }

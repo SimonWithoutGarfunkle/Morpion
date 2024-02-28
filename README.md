@@ -16,6 +16,10 @@ Ce programme utilise principalement les téchnologies suivantes coté Back :
 - Spring Boot 3.2
 - MySQL 8.1
 
+Le Front est disponible ici :
+https://github.com/SimonWithoutGarfunkle/Front-Morpion
+Il utilise HTML, CSS et JavaScript (Vanilla).
+
 ### Prerequis
 
 Pour installer et lancer ce programme, vous devez disposez de la configuration suivante :

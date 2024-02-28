@@ -38,10 +38,11 @@ public class PartieController {
      *
      * @param emplacement à jouer
      * @param id de la partie
+     * @return true si le tour est valide et a été joué, false sinon
      */
     @PostMapping("/{id}/tour")
-    public void jouerTour(@RequestParam int emplacement, @PathVariable(value = "id") Integer id) {
-        partieService.ajouterTourAPartie(id, emplacement);
+    public boolean jouerTour(@RequestParam int emplacement, @PathVariable(value = "id") Integer id) {
+        return partieService.ajouterTourAPartie(id, emplacement);
     }
 
     /**

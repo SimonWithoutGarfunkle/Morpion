@@ -2,11 +2,12 @@ package fr.perso.morpion.service;
 
 import fr.perso.morpion.model.Joueur;
 import fr.perso.morpion.model.Partie;
+import fr.perso.morpion.model.StatusPartie;
 import fr.perso.morpion.model.Tour;
 
 public interface IPartieService {
 
-    void ajouterTourAPartie(Integer idPartie, int emplacement);
+    boolean ajouterTourAPartie(Integer idPartie, int emplacement);
 
     Joueur prochainJoueurAJouer(Partie partie);
 
@@ -25,4 +26,12 @@ public interface IPartieService {
     boolean validerPartie(Partie partie);
 
     int commencerPartie(String joueur1, String joueur2);
+
+    boolean miseAJourStatusPartie(Partie partie);
+
+    StatusPartie mettreAJourStatusPartie(Partie partie);
+
+    StatusPartie quiGagne(Partie partie);
+
+    Character[][] grilleOnlyJoueur(Partie partie, Joueur joueur);
 }
