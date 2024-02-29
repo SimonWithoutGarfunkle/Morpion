@@ -27,8 +27,6 @@ public interface IPartieService {
 
     int commencerPartie(String joueur1, String joueur2);
 
-    boolean miseAJourStatusPartie(Partie partie);
-
     StatusPartie mettreAJourStatusPartie(Partie partie);
 
     StatusPartie quiGagne(Partie partie);

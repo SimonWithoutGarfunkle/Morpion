@@ -33,6 +33,7 @@ public class Partie {
 
     private int hauteur;
 
+    @Enumerated(EnumType.STRING)
     private StatusPartie statusPartie = StatusPartie.EN_COURS;
 
     public Partie (Joueur joueur1, Joueur joueur2, int longueur, int hauteur) {

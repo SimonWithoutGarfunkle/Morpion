@@ -46,6 +46,17 @@ public class PartieController {
     }
 
     /**
+     * Demande l'etat de la partie (en cours, égalité ou qui a gagné)
+     *
+     * @param id de la partie
+     * @return l'etat de la partie
+     */
+    @GetMapping("/{id}/status")
+    public String statusPartie(@PathVariable(value = "id") Integer id) {
+        return partieService.getPartieById(id).getStatusPartie().toString();
+    }
+
+    /**
      * Demarre une nouvelle partie
      *
      * @return l'id de la nouvelle partie

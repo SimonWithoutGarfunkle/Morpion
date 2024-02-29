@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class PartieServiceImpl implements IPartieService {
@@ -35,7 +38,8 @@ public class PartieServiceImpl implements IPartieService {
             logger.info("Tour valide");
             tour = tourService.ajouterTour(tour);
             partie.getTours().add(tour);
-            partieRepository.save(partie);
+            partie = partieRepository.save(partie);
+            mettreAJourStatusPartie(partie);
             return true;
         } else {
             logger.info("Tour invalide");
@@ -72,7 +76,6 @@ public class PartieServiceImpl implements IPartieService {
         Character[] grille = new Character[partie.getHauteur() * partie.getLongueur()];
         Arrays.fill(grille, ' ');
         partie.getTours().forEach(tour -> grille[tour.getEmplacement()] = tour.getMarqueur());
-
         return grille;
     }
 
@@ -83,9 +86,7 @@ public class PartieServiceImpl implements IPartieService {
         if (tour.getPartie() != partie) { return false; }
         if (tour.getMarqueur() != partie.getJoueur1().getMarqueur()
                 && tour.getMarqueur() != partie.getJoueur2().getMarqueur()) { return false; }
-        if (tour.getNumeroTour() != partie.getTours().size() + 1) { return false; }
-
-        return true;
+        return tour.getNumeroTour() == partie.getTours().size() + 1;
 
     }
 
@@ -103,22 +104,24 @@ public class PartieServiceImpl implements IPartieService {
     }
 
     @Override
-    public boolean miseAJourStatusPartie(Partie partie) {
-        return false;
-    }
-
-    @Override
     public StatusPartie mettreAJourStatusPartie(Partie partie) {
         if (partie.getStatusPartie() != quiGagne(partie)) {
+            logger.info("Mise à jour du status de la partie");
             partie.setStatusPartie(quiGagne(partie));
             modifierPartie(partie);
-        };
+        }
         return partie.getStatusPartie();
     }
 
+
     @Override
     public StatusPartie quiGagne(Partie partie) {
-        if (partie.getTours().size() < 5) { return StatusPartie.EN_COURS; }
+        if (partie.getStatusPartie() != StatusPartie.EN_COURS) { return partie.getStatusPartie(); }
+
+        if (troisALaSuite(grilleOnlyJoueur(partie, partie.getJoueur1()))) { return StatusPartie.JOUEUR1_GAGNE; }
+        if (troisALaSuite(grilleOnlyJoueur(partie, partie.getJoueur2()))) { return StatusPartie.JOUEUR2_GAGNE; }
+        if (partie.getTours().size() == partie.getLongueur() * partie.getHauteur()) { return StatusPartie.EGALITE; }
+        logger.info("Qui Gagne ? -> Partie en cours");
 
         return StatusPartie.EN_COURS;
     }
@@ -126,15 +129,62 @@ public class PartieServiceImpl implements IPartieService {
     @Override
     public Character[][] grilleOnlyJoueur(Partie partie, Joueur joueur) {
         Character[][] grille = new Character[partie.getHauteur()][partie.getLongueur()];
+        Arrays.stream(grille).forEach(row -> Arrays.fill(row, '-'));
         partie.getTours().stream().filter(t -> t.getMarqueur() == joueur.getMarqueur()).forEach(t -> {
             int x = t.getEmplacement() % partie.getLongueur();
             int y = t.getEmplacement() / partie.getLongueur();
-            grille[y][x] = t.getMarqueur();
+            grille[y][x] = 'x';
         });
-
-        
-
         return grille;
     }
 
+    public boolean troisALaSuite(Character[][] grille) {
+        return testLigne(grille) || testColonne(grille) || testDiagonalePrincipale(grille) || testDiagonaleSecondaire(grille);
+    }
+
+    public boolean testLigne(Character[][] grille) {
+        return Arrays.stream(grille, 0, grille.length)
+                .anyMatch(this::matchString);
+    }
+
+    public boolean matchString(Character[] ligne) {
+        Pattern pattern = Pattern.compile("xxx");
+        return pattern.matcher(Arrays.stream(ligne).map(String::valueOf).collect(Collectors.joining())).find();
+    }
+
+    public boolean testColonne(Character[][] grille) {
+        return testLigne(rotation90DegreDroite(grille));
+    }
+
+    private Character[][] rotation90DegreDroite(Character[][] grille) {
+        afficherGrilleDansConsole("Avant rotation : ", grille);
+
+        Character[][] grilleRotated = IntStream.range(0, grille.length)
+                .mapToObj(i -> IntStream.range(0, grille.length)
+                        .mapToObj(j -> grille[grille.length - j - 1][i])
+                        .toArray(Character[]::new))
+                .toArray(Character[][]::new);
+
+        afficherGrilleDansConsole("Après rotation : ", grilleRotated);
+        return grilleRotated;
+    }
+
+    public boolean testDiagonalePrincipale(Character[][] grille) {
+        Pattern pattern = Pattern.compile("xxx");
+        String diagonal = IntStream.range(0, grille.length)
+                .mapToObj(i -> grille[i][i].toString())
+                .collect(Collectors.joining());
+        return pattern.matcher(diagonal).find();
+    }
+
+    public boolean testDiagonaleSecondaire(Character[][] grille) {
+        return testDiagonalePrincipale(rotation90DegreDroite(grille));
+    }
+
+    public void afficherGrilleDansConsole(String string, Character[][] grille) {
+        System.out.println(string);
+        for (Character[] row : grille) {
+            System.out.println(Arrays.stream(row).map(String::valueOf).collect(Collectors.joining()));
+        }
+    }
 }
