@@ -16,7 +16,8 @@ public class Partie {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idPartie;
+    @Column(name = "id_partie")
+    private Integer id;
 
     @OneToMany(mappedBy = "partie", cascade = CascadeType.ALL)
     private List<Tour> tours;

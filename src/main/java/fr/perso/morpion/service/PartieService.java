@@ -1,14 +1,13 @@
-package fr.perso.morpion.service.implementation;
+package fr.perso.morpion.service;
 
 import fr.perso.morpion.model.Joueur;
 import fr.perso.morpion.model.Partie;
 import fr.perso.morpion.model.StatusPartie;
 import fr.perso.morpion.model.Tour;
 import fr.perso.morpion.repository.PartieRepository;
-import fr.perso.morpion.service.IPartieService;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.logging.Logger;
@@ -17,20 +16,23 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
-public class PartieServiceImpl implements IPartieService {
+public class PartieService {
 
-    @Autowired
-    private PartieRepository partieRepository;
+    private final PartieRepository partieRepository;
 
-    @Autowired
-    private JoueurServiceImpl joueurService;
+    private final JoueurService joueurService;
 
-    @Autowired
-    private TourServiceImpl tourService;
+    private final TourService tourService;
 
     private static final Logger logger = Logger.getLogger(LoggerFactory.class.getName());
 
-    @Override
+    public PartieService(PartieRepository partieRepository, JoueurService joueurService, TourService tourService) {
+        this.partieRepository = partieRepository;
+        this.joueurService = joueurService;
+        this.tourService = tourService;
+    }
+
+    @Transactional
     public boolean ajouterTourAPartie(Integer idPartie, int emplacement) {
         Partie partie = getPartieById(idPartie);
         Tour tour = new Tour(partie, partie.getTours().size() + 1, prochainJoueurAJouer(partie).getMarqueur(), emplacement);
@@ -47,7 +49,6 @@ public class PartieServiceImpl implements IPartieService {
         }
     }
 
-    @Override
     public Joueur prochainJoueurAJouer(Partie partie) {
         if (partie.getTours().isEmpty()) {
             return partie.getJoueur1();
@@ -59,19 +60,15 @@ public class PartieServiceImpl implements IPartieService {
         }
     }
 
-    @Override
     public Partie ajouterPartie(Partie partie) { return partieRepository.save(partie);  }
 
-    @Override
     public Partie getPartieById(Integer id) { return partieRepository.findById(id).orElse(null); }
 
-    @Override
     public Partie modifierPartie(Partie partie) { return partieRepository.save(partie); }
 
-    @Override
     public void supprimerPartie(Integer id) { partieRepository.deleteById(id); }
 
-    @Override
+    @Transactional
     public Character[] recupererGrille(Partie partie) {
         Character[] grille = new Character[partie.getHauteur() * partie.getLongueur()];
         Arrays.fill(grille, ' ');
@@ -79,7 +76,6 @@ public class PartieServiceImpl implements IPartieService {
         return grille;
     }
 
-    @Override
     public boolean validerTour(Partie partie, Tour tour) {
         if (tour.getEmplacement() < 0 || tour.getEmplacement() >= partie.getLongueur() * partie.getHauteur()) { return false; }
         if (partie.getTours().stream().anyMatch(t -> t.getEmplacement() == (tour.getEmplacement()))) { return false; }
@@ -90,20 +86,14 @@ public class PartieServiceImpl implements IPartieService {
 
     }
 
-    @Override
-    public boolean validerPartie(Partie partie) {
-        return true;
-    }
-
-    @Override
+    @Transactional
     public int commencerPartie(String joueur1, String joueur2) {
         Joueur j1 = joueurService.ajouterJoueur(new Joueur(joueur1, 'X'));
         Joueur j2 = joueurService.ajouterJoueur(new Joueur(joueur2, 'O'));
         Partie partie = ajouterPartie(new Partie(j1, j2, 3, 3));
-        return partie.getIdPartie();
+        return partie.getId();
     }
 
-    @Override
     public StatusPartie mettreAJourStatusPartie(Partie partie) {
         if (partie.getStatusPartie() != quiGagne(partie)) {
             logger.info("Mise à jour du status de la partie");
@@ -113,8 +103,6 @@ public class PartieServiceImpl implements IPartieService {
         return partie.getStatusPartie();
     }
 
-
-    @Override
     public StatusPartie quiGagne(Partie partie) {
         if (partie.getStatusPartie() != StatusPartie.EN_COURS) { return partie.getStatusPartie(); }
 
@@ -126,7 +114,6 @@ public class PartieServiceImpl implements IPartieService {
         return StatusPartie.EN_COURS;
     }
 
-    @Override
     public Character[][] grilleOnlyJoueur(Partie partie, Joueur joueur) {
         Character[][] grille = new Character[partie.getHauteur()][partie.getLongueur()];
         Arrays.stream(grille).forEach(row -> Arrays.fill(row, '-'));
@@ -157,15 +144,11 @@ public class PartieServiceImpl implements IPartieService {
     }
 
     private Character[][] rotation90DegreDroite(Character[][] grille) {
-        afficherGrilleDansConsole("Avant rotation : ", grille);
-
         Character[][] grilleRotated = IntStream.range(0, grille.length)
                 .mapToObj(i -> IntStream.range(0, grille.length)
                         .mapToObj(j -> grille[grille.length - j - 1][i])
                         .toArray(Character[]::new))
                 .toArray(Character[][]::new);
-
-        afficherGrilleDansConsole("Après rotation : ", grilleRotated);
         return grilleRotated;
     }
 
@@ -181,6 +164,7 @@ public class PartieServiceImpl implements IPartieService {
         return testDiagonalePrincipale(rotation90DegreDroite(grille));
     }
 
+    //Fonction pour debug
     public void afficherGrilleDansConsole(String string, Character[][] grille) {
         System.out.println(string);
         for (Character[] row : grille) {

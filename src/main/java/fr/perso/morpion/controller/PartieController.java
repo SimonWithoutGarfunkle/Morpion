@@ -1,10 +1,7 @@
 package fr.perso.morpion.controller;
 
-import fr.perso.morpion.model.Partie;
-import fr.perso.morpion.model.Tour;
-import fr.perso.morpion.service.implementation.PartieServiceImpl;
+import fr.perso.morpion.service.PartieService;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.logging.Logger;
@@ -17,10 +14,13 @@ import java.util.logging.Logger;
 @RequestMapping("/api/partie")
 public class PartieController {
 
-    @Autowired
-    private PartieServiceImpl partieService;
+    private final PartieService partieService;
 
     private static final Logger logger = Logger.getLogger(LoggerFactory.class.getName());
+
+    public PartieController(PartieService partieService) {
+        this.partieService = partieService;
+    }
 
     /**
      * Demande la grille de la partie en cours
@@ -61,7 +61,7 @@ public class PartieController {
      *
      * @return l'id de la nouvelle partie
      */
-    @GetMapping("/new")
+    @PostMapping
     public int nouvellePartie() {
         return partieService.commencerPartie("Joueur 1", "Joueur 2");
     }

@@ -29,9 +29,10 @@ public class MorpionApplication {
 	}
 
 
+
 	@PostConstruct
 	public void initializeDatabase() throws SQLException, IOException {
-		Resource resource = applicationContext.getResource("classpath:cleanDB.sql");
+		Resource resource = applicationContext.getResource("classpath:db/migration/cleanDB.sql");
 		try (InputStream inputStream = resource.getInputStream(); Connection connection = dataSource.getConnection()) {
 			ScriptUtils.executeSqlScript(connection, new InputStreamResource(inputStream));
 		}

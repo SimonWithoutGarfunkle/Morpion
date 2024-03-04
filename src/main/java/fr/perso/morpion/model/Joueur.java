@@ -1,9 +1,6 @@
 package fr.perso.morpion.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +15,8 @@ public class Joueur {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idJoueur;
+    @Column(name = "id_joueur")
+    private Integer id;
 
     private String pseudo;
 

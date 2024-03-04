@@ -15,7 +15,8 @@ public class Tour {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idTour;
+    @Column(name = "id_tour")
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "partie_id")
